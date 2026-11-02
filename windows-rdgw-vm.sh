@@ -17,7 +17,7 @@
 #
 #  Usage, on the Proxmox host as root:
 #
-#      bash -c "$(curl -fsSL https://raw.githubusercontent.com/rob-paprocki/proxmox-rdgateway/main/windows-rdgw-vm.sh)"
+#      bash -c "$(curl -fsSL https://raw.githubusercontent.com/rob-paprocki/rdgateway-pve/main/windows-rdgw-vm.sh)"
 #
 #      bash windows-rdgw-vm.sh               # from a checkout
 #      DRY_RUN=1 bash windows-rdgw-vm.sh     # print every command, run nothing
@@ -92,7 +92,7 @@ unset _src
 # fetched. Pin a different ref or point somewhere else entirely with:
 #   REPO_REF=some-branch bash -c "$(curl -fsSL .../windows-rdgw-vm.sh)"
 REPO_REF="${REPO_REF:-main}"
-REPO_RAW="${REPO_RAW:-https://raw.githubusercontent.com/rob-paprocki/proxmox-rdgateway/${REPO_REF}}"
+REPO_RAW="${REPO_RAW:-https://raw.githubusercontent.com/rob-paprocki/rdgateway-pve/${REPO_REF}}"
 SUPPORT_FILES=(Setup-RDGateway.ps1 Configure-Guest.ps1 Invoke-GatewaySetup.ps1 Invoke-CustomScripts.ps1 Get-RDGWStatus.ps1 Invoke-WinAcme.ps1)
 SUPPORT_DIR=""
 

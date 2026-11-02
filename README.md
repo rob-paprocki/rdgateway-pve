@@ -1,4 +1,4 @@
-# proxmox-rdgateway
+# rdgateway-pve
 
 Build a Windows Server 2025 Remote Desktop Gateway on Proxmox VE, without clicking through
 the wizard twice and without guessing at the WMI calls.
@@ -18,7 +18,7 @@ the wizard twice and without guessing at the WMI calls.
 On the Proxmox host, as root:
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/rob-paprocki/proxmox-rdgateway/main/windows-rdgw-vm.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/rob-paprocki/rdgateway-pve/main/windows-rdgw-vm.sh)"
 ```
 
 Or from a checkout, which is the better way to read it first:
@@ -59,6 +59,44 @@ test to confirm it, and sets up a VPS relay as the alternative for people who do
 open port. Client devices install nothing either way.
 
 MIT licensed. Built with Claude.
+
+## Contents
+
+- [Runbook](#runbook)
+- [Phase 0: decide two things before you touch anything](#phase-0-decide-two-things-before-you-touch-anything)
+- [Phase 1: build the VM](#phase-1-build-the-vm)
+- [Phase 2: install Windows](#phase-2-install-windows)
+- [Phase 3: post-install housekeeping](#phase-3-post-install-housekeeping)
+- [Phase 4: the certificate](#phase-4-the-certificate)
+- [Phase 5: configure the gateway](#phase-5-configure-the-gateway)
+- [Phase 6: getting to it from outside](#phase-6-getting-to-it-from-outside)
+- [Phase 7: connect](#phase-7-connect)
+- [Things worth knowing](#things-worth-knowing)
+- [Undo](#undo)
+- [Sources](#sources)
+
+## Before you start
+
+You need:
+
+- [ ] A Proxmox VE host on x86_64 hardware, and root on it. The script was written against Proxmox VE 8 and 9.
+- [ ] A Windows Server 2025 ISO already uploaded to a Proxmox ISO storage. The script lists the ISOs it finds and stops if there are none. It does not download Windows. The free Evaluation ISO is supported; see [the unattended questions](#the-unattended-questions).
+- [ ] The VirtIO driver ISO (`virtio-win.iso`). If none is in your storage, the script offers to download it, about 700 MB.
+- [ ] Room for the VM. The defaults are 4 cores, 6 GiB of RAM and an 80 GiB disk.
+- [ ] A hostname for clients to type, such as `rdg.yourdomain.tld`, that resolves from the public internet to your WAN address or to your relay's address. [Phase 0](#phase-0-decide-two-things-before-you-touch-anything) covers it.
+- [ ] A way in from outside your LAN: either a router port-forward for TCP 443 ([Option A](#option-a-forward-the-port)) or the VPS relay below.
+- [ ] For the unattended build only, `xorriso`, `genisoimage` or `mkisofs` on the Proxmox host. The script stops and prints `apt-get install -y xorriso` if it finds none.
+
+Optional:
+
+- [ ] A Cloudflare API token with `Zone:DNS:Edit`, to get a Let's Encrypt certificate. The scripts validate through the Cloudflare DNS plugin, so the domain's DNS has to be on Cloudflare. Any certificate choice other than self-signed also has the VM download win-acme from GitHub. Without a token you keep the self-signed certificate, which every client has to be told to trust. See [Phase 4](#phase-4-the-certificate).
+- [ ] A small VPS with a public IPv4 address, running Debian or Ubuntu, if you want a relay instead of an open port. See [`RELAY.md`](RELAY.md).
+- [ ] A Windows product key. Without one the build uses the edition's generic key, which selects the edition and expects a KMS host.
+- [ ] Other machines to reach through the gateway. They install nothing, but each needs Remote Desktop switched on. See [what the other machines need](#what-the-other-machines-need).
+
+There is no settings file. You answer the prompts when you run `windows-rdgw-vm.sh`. The environment overrides, such as `DRY_RUN`, `REPO_REF`, `NO_WAIT`, `FOLLOW_SECONDS` and `KEEP_MEDIA`, are documented in the comment header at the top of that script.
+
+Report problems at https://github.com/rob-paprocki/rdgateway-pve/issues.
 
 ## Runbook
 
@@ -105,7 +143,7 @@ Every command it runs is printed before it runs, so you can follow along or lift
 The one-liner at the top works for both paths:
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/rob-paprocki/proxmox-rdgateway/main/windows-rdgw-vm.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/rob-paprocki/rdgateway-pve/main/windows-rdgw-vm.sh)"
 ```
 
 The unattended path needs six more files to put on the ISO it builds: `Setup-RDGateway.ps1`, `Configure-Guest.ps1`, `Invoke-GatewaySetup.ps1`, `Invoke-CustomScripts.ps1`, `Get-RDGWStatus.ps1` and `Invoke-WinAcme.ps1`. Each is resolved on its own: a local copy always wins, and only the ones actually missing are fetched. From a checkout nothing is downloaded and your edits are used. Every URL is printed before it is touched.
@@ -115,7 +153,7 @@ Those files are copied to the unattend CD and run *inside the guest*. They are n
 Pin a branch or tag if you don't want to track `main`:
 
 ```bash
-REPO_REF=v1.0 bash -c "$(curl -fsSL https://raw.githubusercontent.com/rob-paprocki/proxmox-rdgateway/v1.0/windows-rdgw-vm.sh)"
+REPO_REF=v1.0.0 bash -c "$(curl -fsSL https://raw.githubusercontent.com/rob-paprocki/rdgateway-pve/v1.0.0/windows-rdgw-vm.sh)"
 ```
 
 `REPO_RAW` overrides the base URL outright, for a fork or an internal mirror.
