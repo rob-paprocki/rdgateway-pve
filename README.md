@@ -84,7 +84,7 @@ You need:
 - [ ] The VirtIO driver ISO (`virtio-win.iso`). If none is in your storage, the script offers to download it, about 700 MB.
 - [ ] Room for the VM. The defaults are 4 cores, 6 GiB of RAM and an 80 GiB disk.
 - [ ] A hostname for clients to type, such as `rdg.yourdomain.tld`, that resolves from the public internet to your WAN address or to your relay's address. [Phase 0](#phase-0-decide-two-things-before-you-touch-anything) covers it.
-- [ ] A way in from outside your LAN: either a router port-forward for TCP 443 ([Option A](#option-a-forward-the-port)) or the VPS relay below.
+- [ ] A way in from outside your LAN: either a router port-forward for TCP 443 ([Option A](#option-a-forward-the-port)) or the VPS relay in [Option B](#option-b-a-public-relay-nothing-open-at-home).
 - [ ] For the unattended build only, `xorriso`, `genisoimage` or `mkisofs` on the Proxmox host. The script stops and prints `apt-get install -y xorriso` if it finds none.
 
 Optional:
@@ -94,9 +94,9 @@ Optional:
 - [ ] A Windows product key. Without one the build uses the edition's generic key, which selects the edition and expects a KMS host.
 - [ ] Other machines to reach through the gateway. They install nothing, but each needs Remote Desktop switched on. See [what the other machines need](#what-the-other-machines-need).
 
-There is no settings file. You answer the prompts when you run `windows-rdgw-vm.sh`. The environment overrides, such as `DRY_RUN`, `REPO_REF`, `NO_WAIT`, `FOLLOW_SECONDS` and `KEEP_MEDIA`, are documented in the comment header at the top of that script.
+Settings come from the prompts you answer when you run `windows-rdgw-vm.sh`; there is no settings file. The environment overrides, such as `DRY_RUN`, `REPO_REF`, `NO_WAIT`, `FOLLOW_SECONDS` and `KEEP_MEDIA`, are documented in the comment header at the top of that script.
 
-Report problems at https://github.com/rob-paprocki/rdgateway-pve/issues.
+Open an issue at https://github.com/rob-paprocki/rdgateway-pve/issues if something goes wrong.
 
 ## Runbook
 
